@@ -52,4 +52,13 @@ $functions = array(
         'capabilities'  => 'mod/bigbluebuttonbn:view',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+    'mod_bigbluebutton_recording_list_table' => array(
+        'classname'     => 'mod_bigbluebuttonbn\\local\\api\\recordings',
+        'methodname'    => 'recording_list_table',
+        'description'   => 'Returns a list of recordings ready to be processed by a datatable.',
+        'type'          => 'read',
+        'ajax'          => true,
+        'capabilities'  => 'mod/bigbluebuttonbn:managerecordings', // Not too sure about this access right yet.
+    ),
+
 );
