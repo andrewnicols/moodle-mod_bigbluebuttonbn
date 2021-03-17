@@ -429,6 +429,9 @@ class recording {
                     $buttonpayload['disabled'] = 'invisible';
                 }
             }
+            if ($tool == 'delete') {
+                $buttonpayload['requireconfirmation'] = true;
+            }
             $actionbar .= view::bigbluebuttonbn_actionbar_render_button($recording, $buttonpayload);
         }
         $head = html_writer::start_tag('div', array(

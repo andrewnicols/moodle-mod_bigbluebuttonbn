@@ -153,8 +153,13 @@ class view {
             $output .= self::view_render_recording_section($bbbsession, $type,
                 $enabledfeatures, $jsvars);
             $output .= html_writer::end_tag('div');
+            /*
             $PAGE->requires->yui_module('moodle-mod_bigbluebuttonbn-recordings',
                 'M.mod_bigbluebuttonbn.recordings.init', array($jsvars));
+             */
+
+            $PAGE->requires->js_call_amd('mod_bigbluebuttonbn/recordings', 'init', [$jsvars]);
+
         } else if ($type == bbb_constants::BIGBLUEBUTTONBN_TYPE_RECORDING_ONLY) {
             $recordingsdisabled = get_string('view_message_recordings_disabled', 'bigbluebuttonbn');
             $output .= self::bigbluebuttonbn_render_warning($recordingsdisabled, 'danger');
@@ -294,8 +299,8 @@ class view {
         $search = get_string('search');
         $output = "<form id='bigbluebuttonbn_recordings_searchform'>
                  <input id='searchtext' type='text'>
-                 <input id='searchsubmit' type='submit' value='{$search}'>
-                 <input id='searchreset' type='submit' value='{$reset}'>
+                 <input type='submit' value='{$search}'>
+                 <input type='reset' value='{$reset}'>
                </form>";
         $output .= html_writer::div('', '', array('id' => 'bigbluebuttonbn_recordings_table'));
 
@@ -315,12 +320,11 @@ class view {
         if (!$enabledfeatures['importrecordings'] || !$bbbsession['importrecordings']) {
             return '';
         }
-        $button = html_writer::tag('input', '',
-            array('type' => 'button',
-                'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
-                'class' => 'btn btn-secondary',
-                'onclick' => 'window.location=\'' . $CFG->wwwroot . '/mod/bigbluebuttonbn/import_view.php?bn=' .
-                    $bbbsession['bigbluebuttonbn']->id . '\''));
+        $button = html_writer::tag('input', '', [
+            'type' => 'button',
+            'value' => get_string('view_recording_button_import', 'bigbluebuttonbn'),
+            'class' => 'btn btn-secondary',
+        ]);
         $output = html_writer::empty_tag('br');
         $output .= html_writer::tag('span', $button, array('id' => 'import_recording_links_button'));
         $output .= html_writer::tag('span', '', array('id' => 'import_recording_links_table'));
@@ -541,14 +545,13 @@ class view {
             $target .= '-' . $data['target'];
         }
         $id = 'recording-' . $target . '-' . $recording['recordID'];
-        $onclick = 'M.mod_bigbluebuttonbn.recordings.recording' . ucfirst($data['action']) . '(this); return false;';
         if ((boolean) config::get('recording_icons_enabled')) {
             // With icon for $manageaction.
             $iconattributes = array('id' => $id, 'class' => 'iconsmall');
             $linkattributes = array(
                 'id' => $id,
-                'onclick' => $onclick,
                 'data-action' => $data['action'],
+                'data-require-confirmation' => !empty($data['requireconfirmation']),
             );
             if (!isset($recording['imported'])) {
                 $linkattributes['data-links'] = recording::bigbluebuttonbn_count_recording_imported_instances(
@@ -558,7 +561,6 @@ class view {
             if (isset($data['disabled'])) {
                 $iconattributes['class'] .= ' fa-' . $data['disabled'];
                 $linkattributes['class'] = 'disabled';
-                unset($linkattributes['onclick']);
             }
             $icon = new pix_icon(
                 'i/' . $data['tag'],
@@ -569,8 +571,7 @@ class view {
             return $OUTPUT->action_icon('#', $icon, null, $linkattributes, false);
         }
         // With text for $manageaction.
-        $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger',
-            'onclick' => $onclick);
+        $linkattributes = array('title' => get_string($data['tag']), 'class' => 'btn btn-xs btn-danger');
         return $OUTPUT->action_link('#', get_string($data['action']), null, $linkattributes);
     }
 

@@ -53,12 +53,19 @@ $functions = array(
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
     'mod_bigbluebutton_recording_list_table' => array(
-        'classname'     => 'mod_bigbluebuttonbn\\local\\api\\recordings',
-        'methodname'    => 'recording_list_table',
+        'classname'     => 'mod_bigbluebuttonbn\external\get_recordings',
+        'methodname'    => 'execute',
         'description'   => 'Returns a list of recordings ready to be processed by a datatable.',
         'type'          => 'read',
         'ajax'          => true,
-        'capabilities'  => 'mod/bigbluebuttonbn:managerecordings', // Not too sure about this access right yet.
+        'capabilities'  => 'mod/bigbluebuttonbn:view',
     ),
-
+    'mod_bigbluebutton_recording_update_recording' => array(
+        'classname'     => 'mod_bigbluebuttonbn\external\update_recording',
+        'methodname'    => 'execute',
+        'description'   => 'Update a single recording',
+        'type'          => 'write',
+        'ajax'          => true,
+        'capabilities'  => 'mod/bigbluebuttonbn:managerecordings',
+    ),
 );

@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -13,22 +12,14 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+import config from 'core/config';
 
-/**
- * Version for BigBlueButtonBN Moodle Activity Module.
- *
- * @package   mod_bigbluebuttonbn
- * @copyright 2010 onwards, Blindside Networks Inc
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author    Jesus Federico  (jesus [at] blindsidenetworks [dt] com)
- * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
- */
+export const init = data => {
+    document.querySelector('#menuimport_recording_links_select').addEventListener('change', e => {
+        const searchUrl = new URL(`${config.wwwroot}/mod/bigbluebuttonbn/import_view.php`);
+        searchUrl.set('bn', data.bn);
+        searchUrl.set('tc', e.target.value);
 
-defined('MOODLE_INTERNAL') || die;
-
-$plugin->version = 2021031504;
-$plugin->requires = 2016120500;
-$plugin->cron = 0;
-$plugin->component = 'mod_bigbluebuttonbn';
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = '2.4-beta';
+        window.location = searchUrl.toString();
+    });
+};
