@@ -29,7 +29,7 @@ namespace mod_bigbluebuttonbn\output;
 use coding_exception;
 use html_table;
 use html_writer;
-use mod_bigbluebuttonbn\helpers\roles;
+use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\plugin;
 use renderable;
