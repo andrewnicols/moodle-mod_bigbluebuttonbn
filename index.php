@@ -24,6 +24,7 @@
  * @author    Fred Dixon  (ffdixon [at] blindsidenetworks [dt] com)
  */
 
+use core\notification;
 use mod_bigbluebuttonbn\local\helpers\logs;
 use mod_bigbluebuttonbn\local\helpers\meeting;
 use mod_bigbluebuttonbn\local\helpers\roles;
@@ -37,10 +38,7 @@ $id = required_param('id', PARAM_INT);
 $a = optional_param('a', 0, PARAM_INT);
 $g = optional_param('g', 0, PARAM_INT);
 
-$course = $DB->get_record('course', ['id' => $id]);
-if (!$course) {
-    throw new moodle_exception('invalidcourseid');
-}
+$course = get_course($id);
 
 require_login($course, true);
 
@@ -51,37 +49,21 @@ $PAGE->set_cacheable(false);
 $PAGE->set_pagelayout('incourse');
 
 $PAGE->navbar->add($PAGE->title, $PAGE->url);
-
-$action = optional_param('action', '', PARAM_TEXT);
-if ($action === 'end') {
-    // A request to end the meeting.
-    $bigbluebuttonbn = $DB->get_record('bigbluebuttonbn', ['id' => $a]);
-    if (!$bigbluebuttonbn) {
-        throw new moodle_exception('index_error_bbtn', plugin::COMPONENT, '', $a);
-    }
-    $course = $DB->get_record('course', array('id' => $bigbluebuttonbn->course), '*', MUST_EXIST);
-    $cm = get_coursemodule_from_instance('bigbluebuttonbn', $bigbluebuttonbn->id, $course->id, false, MUST_EXIST);
-    // User roles.
-    $participantlist = roles::bigbluebuttonbn_get_participant_list($bigbluebuttonbn, $PAGE->context);
-    $moderator = roles::bigbluebuttonbn_is_moderator($PAGE->context, $participantlist);
-    $administrator = is_siteadmin();
-    if ($moderator || $administrator) {
-        logs::bigbluebuttonbn_event_log(\mod_bigbluebuttonbn\event\events::$events['meeting_end'], $bigbluebuttonbn);
-        echo get_string('index_ending', plugin::COMPONENT);
-        $meetingid = sprintf('%s-%d-%d', $bigbluebuttonbn->meetingid, $course->id, $bigbluebuttonbn->id);
-        if ($g != 0) {
-            $meetingid .= sprintf('[%d]', $g);
-        }
-
-        meeting::bigbluebuttonbn_end_meeting($meetingid, $bigbluebuttonbn->moderatorpass);
-        redirect($PAGE->url);
-    }
-}
+$PAGE->requires->js_call_amd('mod_bigbluebuttonbn/index', 'init');
 
 /** @var renderer $renderer */
 $renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
-echo $renderer->render(new index($course));
+if ($instances = get_all_instances_in_course('bigbluebuttonbn', $course)) {
+    echo $renderer->render(new index($course, $instances));
+} else {
+    \core\notification::add(
+        get_string('index_error_noinstances', plugin::COMPONENT),
+        \core\notification::ERROR
+    );
+
+    redirect(plugin::necurl('/course/view.php', ['id' => $course->id]));
+}
 echo $OUTPUT->footer();
