@@ -13,10 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+import './actions';
 import * as repository from './repository';
-import {exception as displayException} from 'core/notification';
-import Config from 'core/config';
 import * as roomUpdater from './roomupdater';
+import Config from 'core/config';
+import {
+    exception as displayException,
+    fetchNotifications,
+} from 'core/notification';
+import {eventTypes} from './events';
 
 export const init = (bigbluebuttonbnid) => {
     const completionElement = document.querySelector('a[href*=completion_validate]');
@@ -83,18 +88,12 @@ export const initActions = () => {
 
             return;
         }
+    });
 
-        if (actionButton.dataset.action === "end") {
-            e.preventDefault();
-            repository.endMeeting(bbbId, actionButton.dataset.meetingId)
-            .then(() => {
-                roomUpdater.stop();
-                roomUpdater.updateRoom();
-
-                return;
-            })
-            .catch(displayException);
-        }
+    document.addEventListener(eventTypes.sessionEnded, () => {
+        roomUpdater.stop();
+        roomUpdater.updateRoom();
+        fetchNotifications();
     });
 };
 
