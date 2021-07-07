@@ -25,21 +25,13 @@
  */
 
 use core\notification;
-use mod_bigbluebuttonbn\local\helpers\logs;
-use mod_bigbluebuttonbn\local\helpers\meeting;
-use mod_bigbluebuttonbn\local\helpers\roles;
 use mod_bigbluebuttonbn\output\index;
-use mod_bigbluebuttonbn\output\renderer;
 use mod_bigbluebuttonbn\plugin;
 
 require(__DIR__.'/../../config.php');
 
 $id = required_param('id', PARAM_INT);
-$a = optional_param('a', 0, PARAM_INT);
-$g = optional_param('g', 0, PARAM_INT);
-
 $course = get_course($id);
-
 require_login($course, true);
 
 $PAGE->set_url('/mod/bigbluebuttonbn/index.php', ['id' => $id]);
@@ -49,14 +41,12 @@ $PAGE->set_cacheable(false);
 $PAGE->set_pagelayout('incourse');
 
 $PAGE->navbar->add($PAGE->title, $PAGE->url);
-$PAGE->requires->js_call_amd('mod_bigbluebuttonbn/index', 'init');
-
-/** @var renderer $renderer */
-$renderer = $PAGE->get_renderer(plugin::COMPONENT);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('index_heading', plugin::COMPONENT));
 if ($instances = get_all_instances_in_course('bigbluebuttonbn', $course)) {
+    /** @var mod_bigbluebuttonbn\output\renderer $renderer */
+    $renderer = $PAGE->get_renderer(plugin::COMPONENT);
     echo $renderer->render(new index($course, $instances));
 } else {
     \core\notification::add(
