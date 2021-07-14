@@ -50,6 +50,16 @@ class behat_mod_bigbluebuttonbn_generator extends behat_generator_base {
                         'required' => ['bigbluebuttonbn', 'user'],
                         'switchids' => ['bigbluebuttonbn' => 'bigbluebuttonbnid', 'user' => 'userid'],
                 ],
+                'meeting' => [
+                    'datagenerator' => 'meeting',
+                    'required' => [
+                        'activity',
+                   ],
+                   'switchids' => [
+                       'activity' => 'instanceid',
+                       'group' => 'groupid',
+                   ],
+                ],
         ];
     }
 
@@ -66,6 +76,24 @@ class behat_mod_bigbluebuttonbn_generator extends behat_generator_base {
         if (!$id = $DB->get_field('bigbluebuttonbn', 'id', ['name' => $bbactivityname])) {
             throw new Exception('There is no bigbluebuttonbn with name "' . $bbactivityname . '" does not exist');
         }
+        return $id;
+    }
+
+    protected function get_activity_id(string $activityname): int {
+        global $DB;
+
+        $sql = <<<EOF
+            SELECT cm.instance
+              FROM {course_modules} cm
+        INNER JOIN {modules} m ON m.id = cm.module
+        INNER JOIN {bigbluebuttonbn} bbb ON bbb.id = cm.instance
+             WHERE cm.idnumber = :idnumber or bbb.name = :name
+EOF;
+        $id = $DB->get_field_sql($sql, ['idnumber' => $activityname, 'name' => $activityname]);
+        if (empty($id)) {
+            throw new Exception("There is no bigbluebuttonbn with name '{$activityname}' does not exist");
+        }
+
         return $id;
     }
 }

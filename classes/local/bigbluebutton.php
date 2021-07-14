@@ -76,6 +76,10 @@ class bigbluebutton {
      */
     public static function sanitized_url() {
         $serverurl = trim(config::get('server_url'));
+        if (defined('BEHAT_SITE_RUNNING')) {
+            // TODO Make this a setting.
+            $serverurl = (new moodle_url('/mod/bigbluebuttonbn/tests/fixtures/mockedserver.php'))->out(false);
+        }
         if (substr($serverurl, -1) == '/') {
             $serverurl = rtrim($serverurl, '/');
         }

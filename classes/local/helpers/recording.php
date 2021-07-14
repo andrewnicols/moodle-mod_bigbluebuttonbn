@@ -91,10 +91,7 @@ class recording {
         // Having a recording singleton which instantiation would depend on the condition here or
         // overriding the higher level function (bigbluebuttonbn_get_recordings_array).
 
-        if ((defined('PHPUNIT_TEST') && PHPUNIT_TEST)
-            || defined('BEHAT_SITE_RUNNING')
-            || defined('BEHAT_TEST')
-            || defined('BEHAT_UTIL')) {
+        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             // Just return the fake recording.
             global $CFG;
             require_once($CFG->libdir . '/testing/generator/lib.php');
