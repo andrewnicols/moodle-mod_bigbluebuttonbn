@@ -37,4 +37,64 @@ class behat_mod_bigbluebuttonbn extends behat_base {
             new behat_component_named_selector('Meeting identifier', [".//*[@data-identifier=%locator%]"]),
         ];
     }
+
+    /**
+     * Convert page names to URLs for steps like 'When I am on the "[page name]" page'.
+     *
+     * Recognised page names are:
+     * | None so far!      |                                                              |
+     *
+     * @param string $page name of the page, with the component name removed e.g. 'Admin notification'.
+     * @return moodle_url the corresponding URL.
+     * @throws Exception with a meaningful error message if the specified page cannot be found.
+     */
+    protected function resolve_page_url(string $page): moodle_url {
+        switch ($page) {
+            default:
+                throw new Exception("Unrecognised page type '{$page}'.");
+        }
+    }
+
+    /**
+     * Convert page names to URLs for steps like 'When I am on the "[identifier]" "[page type]" page'.
+     *
+     * Recognised page names are:
+     * | pagetype | name meaning     | description                    |
+     * | Index    | BBB Course Index | The bbb index page (index.php) |
+     *
+     * @param string $type identifies which type of page this is, e.g. 'Indez'.
+     * @param string $identifier identifies the particular page, e.g. 'Mathematics 101'.
+     * @return moodle_url the corresponding URL.
+     * @throws Exception with a meaningful error message if the specified page cannot be found.
+     */
+    protected function resolve_page_instance_url(string $type, string $identifier): moodle_url {
+        global $DB;
+
+        switch ($type) {
+            case 'Index':
+                $course = $this->get_course_id($identifier);
+                return new moodle_url('/mod/bigbluebuttonbn/index.php', [
+                    'id' => $this->get_course_id($identifier),
+                ]);
+
+            default:
+                throw new Exception("Unrecognised page type '{$type}'.");
+        }
+    }
+
+    protected function get_course_id(string $identifier): int {
+        global $DB;
+
+        return $DB->get_field_select(
+            'course',
+            'id',
+            "shortname = :shortname OR fullname = :fullname OR idnumber = :idnumber",
+            [
+                'shortname' => $identifier,
+                'fullname' => $identifier,
+                'idnumber' => $identifier,
+            ],
+            MUST_EXIST
+        );
+    }
 }

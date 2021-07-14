@@ -134,6 +134,10 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
 
         $configuration = [];
         foreach ($values as $value) {
+            if (empty($value)) {
+                // Empty value.
+                continue;
+            }
             [$type, $name] = explode(':', $value);
 
             $participant = (object) [
